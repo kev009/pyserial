@@ -64,19 +64,19 @@ def _parse_devinfo_line(line):
     usb_desc = None
 
     # Match the full devinfo format with angle-bracket USB description
-    m = re.match(r'\s*\S+\s+<([^>]*)>.*?pnpinfo\s+(.*)', line)
+    m = re.match(r'\s*\S+\s+<(?P<desc_text>[^>]*)>.*?pnpinfo\s+(?P<props_text>.*)', line)
     if m:
-        desc_text = m.group(1)
+        desc_text = m.group('desc_text')
         # Extract the human-readable part before ", class "
         desc_parts = desc_text.split(', class ')
         if desc_parts:
             usb_desc = desc_parts[0].strip()
-        remainder = m.group(2)
+        props_text = m.group('props_text')
     else:
-        remainder = line
+        props_text = line
 
     # Parse key=value pairs from pnpinfo or fallback line
-    for token in remainder.split():
+    for token in props_text.split():
         kv = token.split('=', maxsplit=1)
         if len(kv) == 2:
             props[kv[0]] = kv[1]
